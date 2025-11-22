@@ -1,0 +1,40 @@
+services:
+  n8n:
+    build: .
+    container_name: n8n
+    restart: unless-stopped
+    networks:
+      - n8n_net
+    ports:
+      - "5678:5678"
+    environment:
+      N8N_SECURE_COOKIE: "false"
+      N8N_HOST: "n8n.[domain].in"
+      N8N_PORT: 5678
+      N8N_PROTOCOL: "https"
+      WEBHOOK_URL: "https://n8n.[domain].in"
+      N8N_TRUSTED_PROXIES: "*"
+    volumes:
+      - n8n_data:/home/node/.n8n
+
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    restart: unless-stopped
+    networks:
+      - n8n_net
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+      - ./Caddyfile:/etc/caddy/Caddyfile
+
+networks:
+  n8n_net:
+
+volumes:
+  n8n_data:
+  caddy_data:
+  caddy_config:
